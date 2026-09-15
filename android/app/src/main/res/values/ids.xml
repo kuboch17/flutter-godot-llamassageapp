@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Stable across platform-view recreation so one retained fragment can reattach. -->
+    <item name="godot_fragment_container" type="id" />
+</resources>
+

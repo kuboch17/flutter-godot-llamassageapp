@@ -1,0 +1,24 @@
+; Reference Godot 4 project bundled into the Android application's assets.
+; Replace this directory with the real project while retaining the bridge contract.
+
+config_version=5
+
+[application]
+
+config/name="Massage Flow Module"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+run/main_scene="res://main.tscn"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1350
+window/stretch/mode="canvas_items"
+window/handheld/orientation=1
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.067, 0.102, 0.094, 1)

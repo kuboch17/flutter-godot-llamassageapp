@@ -1,0 +1,37 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Android
+android/.gradle/
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/local.properties
+*.jks
+*.keystore
+key.properties
+
+# Godot editor-local state. Imported runtime assets under .godot/imported stay
+# trackable because the Android host does not run the editor import pipeline.
+godot_project/.godot/*
+!godot_project/.godot/imported/
+!godot_project/.godot/imported/**
+godot_project/android/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local Codex/build workspace
+/work/
+/outputs/
