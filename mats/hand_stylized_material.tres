@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cu8spspoc6dcn"]
+
+[ext_resource type="Shader" uid="uid://bx5rvwoqnukr5" path="res://mats/hand_stylized.gdshader" id="1_shader"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/base_color = Color(0.94, 0.61, 0.43, 1)
+shader_parameter/texture_strength = 0.15000000596046
+shader_parameter/texture_scale = 5.4930002134175
+shader_parameter/edge_light = 0.08
+shader_parameter/material_roughness = 0.82
