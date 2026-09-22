@@ -2,6 +2,7 @@
 
 A work-in-progress project combining **Flutter** and **Godot**. Development is currently focused on bringing the two parts together in the `flutter-godot` branch.
 
+
 > **Status: Under active development.** The project is incomplete, and its structure, features, and setup may change as development continues.
 
 ## Current development status
@@ -52,6 +53,10 @@ Cloning the repository only downloads the source. Running the combined applicati
 - Continue work on the Godot portion of the project.
 - Develop the combined Flutter + Godot implementation on `flutter-godot`.
 - Document installation, configuration, and usage as the integration becomes ready to run.
+
+## Godot view
+
+<img width="935" height="537" alt="image" src="https://github.com/user-attachments/assets/16036e8d-b6bd-4c9c-912d-ee2e7b0c49a3" />
 
 ## Author
 
