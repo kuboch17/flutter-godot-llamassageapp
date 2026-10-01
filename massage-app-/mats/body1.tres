@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://mdem3kj1squo"]
+
+[ext_resource type="Material" uid="uid://b32ajie1kubc" path="res://mats/white_outline1.tres" id="1_nrdxp"]
+
+[resource]
+next_pass = ExtResource("1_nrdxp")
+albedo_color = Color(0.76851404, 0.5459042, 0.41107512, 1)

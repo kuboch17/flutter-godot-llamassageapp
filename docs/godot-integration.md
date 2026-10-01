@@ -2,9 +2,11 @@
 
 ## Project placement
 
-`android/app/build.gradle.kts` registers `../../godot_project` as an Android
-asset source. Gradle merges the directory contents into the root of the APK's
-`assets/` directory. Do not place another folder between `godot_project/` and
+`android/app/build.gradle.kts` stages `../../massage-app-` with `syncGodotAssets`
+as an Android asset source, excluding APK exports, credentials, repository data,
+and editor caches. Runtime imports and UID/script caches are retained.
+Gradle merges the staged directory contents into the root of the APK's
+`assets/` directory. Do not place another folder between `massage-app-/` and
 `project.godot`.
 
 Using source assets instead of a prebuilt PCK keeps iteration simple and makes

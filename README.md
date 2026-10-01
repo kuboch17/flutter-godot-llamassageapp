@@ -12,8 +12,7 @@ normal Flutter screen. Godot is not launched as a second application.
 - A lifecycle-aware Kotlin host that enforces Godot's one-engine-per-process
   constraint.
 - Bidirectional Flutter ↔ Kotlin ↔ Godot communication using JSON envelopes.
-- A small Godot 4 reference scene that responds to configure, pause, resume,
-  and reset commands and reports interactions back to Flutter.
+- The Godot project in `massage-app-`, starting at `main.tscn`.
 - Dart unit/widget tests and a CI workflow for analyze, test, and Android build.
 
 ## Architecture
@@ -28,7 +27,8 @@ flowchart LR
     Plugin -->|"EventChannel / JSON"| Flutter
 ```
 
-The Android Gradle build adds `godot_project/` directly as an asset source.
+The Android Gradle build stages `massage-app-/` as an asset source, excluding
+standalone APK exports, credentials, repository data, and editor caches.
 Consequently, `project.godot` is packaged at the APK asset root exactly where
 the embedded engine expects it.
 
@@ -52,15 +52,15 @@ larger and slower than a typical Flutter-only build.
 
 ## Use the real Godot project
 
-The repository currently contains a deliberately small reference project
-because no external Godot project was available in the supplied workspace.
-To replace it:
+The embedded project lives in `massage-app-/` and starts its configured
+`main.tscn` scene. To update it:
 
-1. Copy the contents of the real project into `godot_project/` so that
-   `godot_project/project.godot` remains the project root.
+1. Copy the contents of the real project into `massage-app-/` so that
+   `massage-app-/project.godot` remains the project root.
 2. Match `godotVersion` in `android/gradle.properties` to the editor version.
-3. Preserve or adapt the bridge contract documented in
-   `docs/godot-integration.md`.
+3. To support Flutter's session controls and interaction counter, implement the
+   bridge contract documented in `docs/godot-integration.md`; the current Godot
+   project does not yet handle those messages.
 4. If the project uses GDExtension or Android plugins, include their Android
    libraries for every supported ABI and add their Maven/AAR dependencies to
    `android/app/build.gradle.kts`.

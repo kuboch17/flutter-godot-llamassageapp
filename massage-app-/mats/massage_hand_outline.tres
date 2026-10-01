@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://broolnhbqm4co"]
+
+[ext_resource type="Shader" uid="uid://dyl7ms2rypa8y" path="res://mats/massage_hand_outline.gdshader" id="1"]
+[ext_resource type="Material" path="res://mats/massage_hand.tres" id="2"]
+
+[resource]
+render_priority = 126
+next_pass = ExtResource("2")
+shader = ExtResource("1")
+shader_parameter/outline_color = Color(1, 1, 1, 1)
+shader_parameter/outline_width = 0.0173
+shader_parameter/wrist_fade_start = 0.42
+shader_parameter/wrist_fade_end = 0.78
