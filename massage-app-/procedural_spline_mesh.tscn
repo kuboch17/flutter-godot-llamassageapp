@@ -1,0 +1,87 @@
+[gd_scene load_steps=7 format=3 uid="uid://cmj75qal06thb"]
+
+[ext_resource type="Script" uid="uid://ch6hhq4u87lvr" path="res://procedural_spline_mesh.gd" id="1_script"]
+[ext_resource type="Material" path="res://mats/dotted_line.tres" id="2_material"]
+[ext_resource type="Script" uid="uid://bdvwkns80v6fd" path="res://arrow_path_indicator.gd" id="3_arrow_indicator"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_setup_marker"]
+shading_mode = 0
+albedo_color = Color(1, 0.62, 0.08, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_setup_marker"]
+material = SubResource("StandardMaterial3D_setup_marker")
+size = Vector3(0.028, 0.028, 0.028)
+
+[sub_resource type="Curve" id="Curve_speed_profile"]
+resource_local_to_scene = true
+max_value = 3.0
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="ProceduralSplineMesh" type="MeshInstance3D"]
+script = ExtResource("1_script")
+line_material = ExtResource("2_material")
+show_path_mesh = false
+
+[node name="StartPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18, 0.16, 0.03)
+gizmo_extents = 0.04
+
+[node name="SetupCube" type="MeshInstance3D" parent="StartPoint"]
+cast_shadow = 0
+mesh = SubResource("BoxMesh_setup_marker")
+metadata/_edit_lock_ = true
+
+[node name="ControlPoint1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06, 0.22, 0.03)
+gizmo_extents = 0.035
+
+[node name="SetupCube" type="MeshInstance3D" parent="ControlPoint1"]
+cast_shadow = 0
+mesh = SubResource("BoxMesh_setup_marker")
+metadata/_edit_lock_ = true
+
+[node name="ControlPoint2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 0.22, 0.03)
+gizmo_extents = 0.035
+
+[node name="SetupCube" type="MeshInstance3D" parent="ControlPoint2"]
+cast_shadow = 0
+mesh = SubResource("BoxMesh_setup_marker")
+metadata/_edit_lock_ = true
+
+[node name="EndPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.18, 0.16, 0.03)
+gizmo_extents = 0.04
+
+[node name="SetupCube" type="MeshInstance3D" parent="EndPoint"]
+cast_shadow = 0
+mesh = SubResource("BoxMesh_setup_marker")
+metadata/_edit_lock_ = true
+
+[node name="MirrorReference" type="Marker3D" parent="."]
+gizmo_extents = 0.06
+
+[node name="ArrowPathIndicator" type="Node3D" parent="."]
+script = ExtResource("3_arrow_indicator")
+spline_path = NodePath("..")
+speed = 0.28
+arrow_length = 0.12
+arrow_width = 0.055
+shaft_width = 0.04
+surface_offset = 0.018
+moving_arrow_lift = 0.0
+static_arrow_color = Color(0.7, 0.7, 0.7, 0.58)
+moving_arrow_color = Color(1, 1, 1, 1)
+mirror_reference_path = NodePath("../MirrorReference")
+speed_curve = SubResource("Curve_speed_profile")
+
+[node name="StaticArrow" type="MeshInstance3D" parent="ArrowPathIndicator"]
+
+[node name="MovingArrow" type="MeshInstance3D" parent="ArrowPathIndicator"]
+
+[node name="StaticArrowMirror" type="MeshInstance3D" parent="ArrowPathIndicator"]
+visible = false
+
+[node name="MovingArrowMirror" type="MeshInstance3D" parent="ArrowPathIndicator"]
+visible = false

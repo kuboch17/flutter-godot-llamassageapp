@@ -5,23 +5,26 @@
 
 version:
   revision: "9584c6713b324636289d067944a46fd6b49df14b"
-  channel: "stable"
+  channel: "[user-branch]"
 
 project_type: app
 
-# Tracks metadata for the flutter migrate command.
+# Tracks metadata for the flutter migrate command
 migration:
   platforms:
     - platform: root
       create_revision: 9584c6713b324636289d067944a46fd6b49df14b
       base_revision: 9584c6713b324636289d067944a46fd6b49df14b
-    - platform: android
+    - platform: web
       create_revision: 9584c6713b324636289d067944a46fd6b49df14b
       base_revision: 9584c6713b324636289d067944a46fd6b49df14b
 
-  # Files intentionally owned by this project rather than Flutter templates.
+  # User provided section
+
+  # List of Local paths (relative to this file) that should be
+  # ignored by the migrate tool.
+  #
+  # Files that are not part of the templates will be ignored by default.
   unmanaged_files:
     - 'lib/main.dart'
-    - 'android/app/build.gradle.kts'
-    - 'android/app/src/main/AndroidManifest.xml'
-    - 'android/app/src/main/kotlin/dev/massageflow/app/MainActivity.kt'
+    - 'ios/Runner.xcodeproj/project.pbxproj'

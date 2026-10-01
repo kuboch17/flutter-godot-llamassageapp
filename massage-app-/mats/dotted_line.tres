@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://mats/dotted_line.gdshader" id="1_shader"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_shader")
+shader_parameter/line_color = Color(0.04, 0.55, 1, 1)
+shader_parameter/dash_length = 0.035
+shader_parameter/gap_length = 0.025
+shader_parameter/edge_softness = 0.004

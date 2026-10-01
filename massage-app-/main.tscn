@@ -1,0 +1,487 @@
+[gd_scene format=3 uid="uid://bdu5yaubjaljb"]
+
+[ext_resource type="Script" uid="uid://b0la27vhipl7v" path="res://main_menu.gd" id="1_menu"]
+[ext_resource type="Texture2D" uid="uid://bn3rlgehxsxgb" path="res://assets/llama.png" id="2_llama"]
+[ext_resource type="Script" uid="uid://csq1bau0wocld" path="res://gradient_button.gd" id="3_gradient"]
+[ext_resource type="Script" uid="uid://bodd4gysr08kg" path="res://gradient_panel.gd" id="4_panel"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_body"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 72
+corner_radius_top_right = 72
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_detail_card"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 48
+corner_radius_top_right = 48
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_setup"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.76, 0.86, 0.96, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_line_edit"]
+bg_color = Color(0.94, 0.97, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.08, 0.42, 0.9, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_save"]
+bg_color = Color(0.08, 0.42, 0.9, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_save_pressed"]
+bg_color = Color(0.04, 0.28, 0.68, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_save_disabled"]
+bg_color = Color(0.62, 0.72, 0.82, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MainMenu" type="Control" unique_id=9939317]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="." unique_id=286190747]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=121710728]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="Content" type="Control" parent="ScrollContainer" unique_id=453813738]
+custom_minimum_size = Vector2(0, 1860)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Header" type="ColorRect" parent="ScrollContainer/Content" unique_id=1053671423]
+custom_minimum_size = Vector2(0, 430)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = -10.0
+offset_top = -20.0
+offset_right = 11.0
+offset_bottom = 513.0
+grow_horizontal = 2
+color = Color(0.08, 0.42, 0.9, 1)
+
+[node name="LlamaIcon" type="TextureRect" parent="ScrollContainer/Content/Header" unique_id=724700776]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_top = 0.35
+anchor_right = 0.31
+anchor_bottom = 0.98
+offset_left = -197.2
+offset_top = -35.550003
+offset_right = -161.24986
+offset_bottom = -50.302612
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.5128847, 1.4805937)
+texture = ExtResource("2_llama")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WelcomeLabel" type="Label" parent="ScrollContainer/Content/Header" unique_id=671686845]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.22
+anchor_top = 0.56
+anchor_right = 0.95
+anchor_bottom = 0.78
+offset_left = -8.600006
+offset_top = -97.48001
+offset_right = -8.599976
+offset_bottom = -8.73999
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.54509807)
+theme_override_font_sizes/font_size = 61
+text = "Welcome back Jakub"
+vertical_alignment = 2
+autowrap_mode = 2
+
+[node name="Body" type="Panel" parent="ScrollContainer/Content" unique_id=989917982]
+custom_minimum_size = Vector2(0, 1530)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 433.0
+offset_bottom = 1963.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_body")
+
+[node name="BodyContent" type="VBoxContainer" parent="ScrollContainer/Content/Body" unique_id=1217460920]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 42.0
+offset_top = 101.0
+offset_right = -46.0
+offset_bottom = 302.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 36
+
+[node name="QuestionLabel" type="Label" parent="ScrollContainer/Content/Body/BodyContent" unique_id=2098458765]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.14, 0.22, 1)
+theme_override_font_sizes/font_size = 63
+text = "Massage"
+autowrap_mode = 2
+
+[node name="ButtonGrid" type="GridContainer" parent="ScrollContainer/Content/Body/BodyContent" unique_id=1418819083]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 22
+theme_override_constants/v_separation = 22
+columns = 2
+
+[node name="BackButton" type="Button" parent="ScrollContainer/Content/Body/BodyContent/ButtonGrid" unique_id=232744837]
+custom_minimum_size = Vector2(0, 485)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Back"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0.02, 0.31, 0.95, 1)
+gradient_right = Color(0.08, 0.85, 1, 1)
+button_height = 224.0
+label_font_size = 44
+label_left_padding = 30.0
+corner_radius = 40.0
+info_text = "A slow massage for the upper and lower back."
+
+[node name="NeckButton" type="Button" parent="ScrollContainer/Content/Body/BodyContent/ButtonGrid" unique_id=1201277623]
+custom_minimum_size = Vector2(0, 485)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Neck"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0, 0.5, 0.36, 1)
+gradient_right = Color(0.19, 0.95, 0.66, 1)
+button_height = 300.0
+label_font_size = 44
+label_left_padding = 30.0
+corner_radius = 40.0
+info_text = "Gentle pressure around the neck and shoulders."
+
+[node name="LegsButton" type="Button" parent="ScrollContainer/Content/Body/BodyContent/ButtonGrid" unique_id=2129670361]
+custom_minimum_size = Vector2(0, 485)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Legs"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0.92, 0.13, 0.39, 1)
+gradient_right = Color(1, 0.61, 0.23, 1)
+button_height = 300.0
+label_font_size = 44
+label_left_padding = 30.0
+corner_radius = 40.0
+info_text = "Relaxing massage for calves, thighs, and tired legs."
+
+[node name="FullbodyButton" type="Button" parent="ScrollContainer/Content/Body/BodyContent/ButtonGrid" unique_id=2107044821]
+custom_minimum_size = Vector2(0, 485)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Fullbody"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0.38, 0.18, 0.92, 1)
+gradient_right = Color(0.98, 0.31, 0.86, 1)
+button_height = 300.0
+label_font_size = 44
+label_left_padding = 30.0
+corner_radius = 40.0
+info_text = "A complete session across the whole body."
+
+[node name="ArmsButton" type="Button" parent="ScrollContainer/Content/Body/BodyContent/ButtonGrid" unique_id=1409046977]
+custom_minimum_size = Vector2(0, 485)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Arms"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0.05, 0.52, 0.74, 1)
+gradient_right = Color(0.34, 0.86, 0.92, 1)
+button_height = 300.0
+label_font_size = 44
+label_left_padding = 30.0
+corner_radius = 40.0
+info_text = "Light recovery massage for arms and forearms."
+
+[node name="FeetButton" type="Button" parent="ScrollContainer/Content/Body/BodyContent/ButtonGrid" unique_id=59096053]
+custom_minimum_size = Vector2(0, 485)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Feet"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0.96, 0.49, 0.08, 1)
+gradient_right = Color(1, 0.85, 0.22, 1)
+button_height = 300.0
+label_font_size = 44
+label_left_padding = 30.0
+corner_radius = 40.0
+info_text = "Focused massage for feet and pressure points."
+
+[node name="BottomSpacer" type="Control" parent="ScrollContainer/Content/Body/BodyContent" unique_id=1782556039]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="DetailScreen" type="Control" parent="." unique_id=1978864005]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DetailGradient" type="Control" parent="DetailScreen" unique_id=338071636]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_panel")
+
+[node name="DetailBackButton" type="Button" parent="DetailScreen" unique_id=866142639]
+layout_mode = 1
+offset_left = 34.0
+offset_top = 44.0
+offset_right = 204.0
+offset_bottom = 118.0
+theme_override_font_sizes/font_size = 32
+text = "Back"
+
+[node name="DetailCard" type="PanelContainer" parent="DetailScreen" unique_id=669591187]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.34
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_detail_card")
+
+[node name="DetailContent" type="Control" parent="DetailScreen/DetailCard" unique_id=59443863]
+custom_minimum_size = Vector2(0, 620)
+layout_mode = 2
+
+[node name="DetailTitle" type="Label" parent="DetailScreen/DetailCard/DetailContent" unique_id=82674453]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.1
+anchor_right = 0.92
+anchor_bottom = 0.25
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.08, 0.14, 0.22, 1)
+theme_override_font_sizes/font_size = 62
+text = "Back"
+autowrap_mode = 2
+
+[node name="DetailInfo" type="Label" parent="DetailScreen/DetailCard/DetailContent" unique_id=877016346]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.32
+anchor_right = 0.92
+anchor_bottom = 0.58
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.12, 0.18, 0.28, 0.72)
+theme_override_font_sizes/font_size = 34
+text = "A slow massage for the upper and lower back."
+autowrap_mode = 2
+
+[node name="StartMassageButton" type="Button" parent="DetailScreen/DetailCard/DetailContent" unique_id=2106142032]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.68
+anchor_right = 0.92
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(806.4, 48)
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_button")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_button")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_button")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_button")
+text = "Start massage"
+flat = true
+script = ExtResource("3_gradient")
+gradient_left = Color(0.02, 0.31, 0.95, 1)
+gradient_right = Color(0.08, 0.85, 1, 1)
+button_height = 96.0
+label_font_size = 34
+label_left_padding = 0.0
+corner_radius = 40.0
+center_label = true
+keep_square = false
+
+[node name="SetupOverlay" type="ColorRect" parent="." unique_id=840012906]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.42, 0.9, 1)
+
+[node name="Panel" type="PanelContainer" parent="SetupOverlay" unique_id=285219009]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.28
+anchor_right = 0.92
+anchor_bottom = 0.55
+theme_override_styles/panel = SubResource("StyleBoxFlat_setup")
+
+[node name="SetupContent" type="VBoxContainer" parent="SetupOverlay/Panel" unique_id=569795935]
+layout_mode = 2
+theme_override_constants/separation = 26
+
+[node name="Question" type="Label" parent="SetupOverlay/Panel/SetupContent" unique_id=849426388]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.14, 0.22, 1)
+theme_override_font_sizes/font_size = 44
+text = "What is your name?"
+horizontal_alignment = 1
+
+[node name="NameInput" type="LineEdit" parent="SetupOverlay/Panel/SetupContent" unique_id=451499182]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.14, 0.22, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_line_edit")
+theme_override_styles/focus = SubResource("StyleBoxFlat_line_edit")
+placeholder_text = "Name"
+
+[node name="SaveNameButton" type="Button" parent="SetupOverlay/Panel/SetupContent" unique_id=186216302]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0.72)
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_save")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_save_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_save")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_save_disabled")
+disabled = true
+text = "Continue"
+
+[connection signal="pressed" from="DetailScreen/DetailBackButton" to="." method="_on_detail_back_button_pressed"]
+[connection signal="pressed" from="DetailScreen/DetailCard/DetailContent/StartMassageButton" to="." method="_on_start_massage_button_pressed"]
+[connection signal="text_changed" from="SetupOverlay/Panel/SetupContent/NameInput" to="." method="_on_name_input_text_changed"]
+[connection signal="text_submitted" from="SetupOverlay/Panel/SetupContent/NameInput" to="." method="_on_name_input_text_submitted"]
+[connection signal="pressed" from="SetupOverlay/Panel/SetupContent/SaveNameButton" to="." method="_on_save_name_button_pressed"]

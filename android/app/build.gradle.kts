@@ -6,6 +6,26 @@ plugins {
 
 val godotVersion = providers.gradleProperty("godotVersion").getOrElse("4.7.2.stable")
 
+val embeddedGodotAssets = layout.buildDirectory.dir("generated/godotAssets")
+val syncGodotAssets by tasks.registering(Sync::class) {
+    from("../../massage-app-")
+    into(embeddedGodotAssets)
+    exclude(".git/**", ".agents/**", "tools/**", "android/**")
+    exclude(".gitignore", ".gitattributes", ".editorconfig", "export_presets.cfg")
+    exclude("**/*.apk", "**/*.idsig", "**/*.aab", "**/*.keystore", "**/*.jks")
+    exclude(".godot/editor/**", ".godot/exported/**", ".godot/shader_cache/**")
+    exclude(".godot/export_credentials.cfg")
+    doFirst {
+        check(file("../../massage-app-/project.godot").isFile) {
+            "Embedded Godot project is missing: massage-app-/project.godot"
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(syncGodotAssets)
+}
+
 android {
     namespace = "dev.massageflow.app"
     compileSdk {
@@ -30,7 +50,7 @@ android {
 
     // Package the Godot project at the APK assets root, where GodotFragment
     // discovers project.godot. This keeps Godot source separate from Flutter UI.
-    sourceSets.getByName("main").assets.srcDir("../../godot_project")
+    sourceSets.getByName("main").assets.srcDir(embeddedGodotAssets.get().asFile)
 
     androidResources {
         // Godot can use hidden import metadata. Android's default asset filter

@@ -23,10 +23,12 @@ key.properties
 
 # Godot editor-local state. Imported runtime assets under .godot/imported stay
 # trackable because the Android host does not run the editor import pipeline.
-godot_project/.godot/*
-!godot_project/.godot/imported/
-!godot_project/.godot/imported/**
-godot_project/android/
+massage-app-/.godot/*
+!massage-app-/.godot/imported/
+!massage-app-/.godot/imported/**
+!massage-app-/.godot/uid_cache.bin
+!massage-app-/.godot/global_script_class_cache.cfg
+massage-app-/android/
 
 # OS
 .DS_Store
@@ -35,3 +37,5 @@ Thumbs.db
 # Local Codex/build workspace
 /work/
 /outputs/
+# Widget Preview related
+.widget_preview/

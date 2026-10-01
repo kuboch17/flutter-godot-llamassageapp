@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cey1ys1mp6lot"]
+
+[ext_resource type="Shader" uid="uid://xtsg2ftsmr35" path="res://mats/massage_hand.gdshader" id="1"]
+
+[resource]
+render_priority = 127
+shader = ExtResource("1")
+shader_parameter/base_color = Color(0.7685, 0.5459, 0.4111, 1)
+shader_parameter/wrist_fade_start = 0.52
+shader_parameter/wrist_fade_end = 1.24
+shader_parameter/material_roughness = 0.78
