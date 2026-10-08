@@ -22,8 +22,16 @@ jobs:
           flutter-version: 3.47.4
           cache: true
 
-      - name: Install Android SDK 36.1
-        run: sdkmanager "platforms;android-36.1"
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK 36.1
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36.1'
 
       - name: Install packages
         run: flutter pub get
