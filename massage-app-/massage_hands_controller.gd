@@ -69,6 +69,17 @@ func _process(delta: float) -> void:
 	_last_progress = progress
 
 
+func set_active_spline(spline: ProceduralSplineMesh) -> void:
+	if spline == null:
+		return
+	_spline = spline
+	_indicator = spline.get_node_or_null("ArrowPathIndicator") as ArrowPathIndicator
+	_returning_to_start = false
+	_return_elapsed = 0.0
+	_last_progress = 0.0
+	_update_hands()
+
+
 func _update_hands() -> void:
 	if not is_inside_tree():
 		return

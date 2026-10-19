@@ -21,6 +21,7 @@ var intro_tween: Tween
 @onready var start_massage_button: Button = $DetailScreen/DetailCard/DetailContent/StartMassageButton
 
 func _ready() -> void:
+	get_tree().auto_accept_quit = true
 	_apply_main_menu_window_mode()
 	get_viewport().size_changed.connect(_sync_layout_to_viewport)
 	_connect_massage_buttons()

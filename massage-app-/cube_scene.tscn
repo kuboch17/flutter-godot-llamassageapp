@@ -963,18 +963,6 @@ light_energy = 2.0
 
 [node name="UiLayer" type="CanvasLayer" parent="." unique_id=913384751]
 
-[node name="BackButton" type="Button" parent="UiLayer" unique_id=524395138]
-offset_left = 32.0
-offset_top = 42.0
-offset_right = 220.0
-offset_bottom = 118.0
-theme_override_colors/font_color = Color(0.08, 0.42, 0.9, 1)
-theme_override_font_sizes/font_size = 34
-theme_override_styles/normal = SubResource("StyleBoxFlat_back")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_back")
-theme_override_styles/hover = SubResource("StyleBoxFlat_back")
-text = "Back"
-
 [node name="MassageHandsController" type="Node" parent="." unique_id=1964898801]
 script = ExtResource("7_hands")
 spline_path = NodePath("../move3")
@@ -1083,7 +1071,7 @@ sorting_offset = 101.0
 material_override = SubResource("ShaderMaterial_pfjai")
 mesh = SubResource("ArrayMesh_2luqx")
 
-[connection signal="pressed" from="UiLayer/BackButton" to="." method="_on_back_button_pressed"]
+
 
 [editable path="handpivot/HandWithAnimationSmooth2"]
 [editable path="move1"]

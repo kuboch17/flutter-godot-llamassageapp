@@ -1,6 +1,13 @@
 package dev.massageflow.app
 
 import androidx.annotation.MainThread
+import android.content.pm.ActivityInfo
+import android.view.WindowManager
+import android.view.View
+import org.json.JSONObject
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -32,6 +39,7 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
 
     @Volatile
     private var godotReady = false
+    private var sessionActive = false
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -75,6 +83,22 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
                     return
                 }
 
+                when (runCatching { JSONObject(messageJson).optString("action") }.getOrNull()) {
+                    "start_session" -> {
+                        sessionActive = true
+                        updateGodotVisibility()
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                        updateSystemBars()
+                    }
+                    "stop_session" -> {
+                        sessionActive = false
+                        updateGodotVisibility()
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        updateSystemBars()
+                    }
+                }
                 plugin.sendToGodot(messageJson)
                 result.success(true)
             }
@@ -117,8 +141,10 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
             }
         }
         godotMounted = true
+        updateSystemBars()
 
         if (godotReady) {
+            updateGodotVisibility()
             emitBridgeEvent("engine_ready", "{}")
         }
     }
@@ -136,6 +162,32 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
         }
         mountedPlatformViewId = null
         godotMounted = false
+        updateSystemBars()
+    }
+
+    // Flutter's legacy immersive modes are ignored when targeting API 36.
+    // Use Android's insets API for the fullscreen Godot surface instead.
+    private fun updateSystemBars() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        if (godotMounted && sessionActive) {
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+        } else {
+            controller.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    // A SurfaceView can render above Flutter's canvas even when the platform
+    // view is behind the Navigator. Hide the native surface itself at the menu.
+    private fun updateGodotVisibility() {
+        godotFragment?.view?.visibility =
+            if (sessionActive) View.VISIBLE else View.INVISIBLE
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && godotMounted) updateSystemBars()
     }
 
     override fun getActivity() = this
@@ -167,6 +219,7 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
 
     override fun onGodotMainLoopStarted() {
         godotReady = true
+        runOnUiThread { updateGodotVisibility() }
         if (godotMounted) {
             emitBridgeEvent("engine_ready", "{}")
         }

@@ -20,6 +20,25 @@ val syncGodotAssets by tasks.registering(Sync::class) {
             "Embedded Godot project is missing: massage-app-/project.godot"
         }
     }
+    doLast {
+        // Flutter owns the menu; the embedded engine starts directly in 3D.
+        val project = embeddedGodotAssets.get().file("project.godot").asFile
+        project.writeText(
+            project.readText().replace(
+                "run/main_scene=\"res://main.tscn\"",
+                "run/main_scene=\"res://embedded_runtime.tscn\"",
+            ).replace(
+                "window/handheld/orientation=6",
+                "window/handheld/orientation=1", // Preload behind the portrait menu.
+            ).replace(
+                "window/size/viewport_width=1080",
+                "window/size/viewport_width=1920",
+            ).replace(
+                "window/size/viewport_height=1920",
+                "window/size/viewport_height=1080",
+            ),
+        )
+    }
 }
 
 tasks.named("preBuild") {
@@ -79,6 +98,27 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+androidComponents {
+    finalizeDsl { androidDsl ->
+        // Flutter selects the phone's ABI, but its default filters still package
+        // Godot's native libraries for every architecture unless narrowed here.
+        val requestedAbis = providers.gradleProperty("target-platform").orNull
+            ?.split(",")
+            ?.mapNotNull { platform ->
+                when (platform.trim()) {
+                    "android-arm" -> "armeabi-v7a"
+                    "android-arm64" -> "arm64-v8a"
+                    "android-x64" -> "x86_64"
+                    else -> null
+                }
+            }
+        if (!androidDsl.splits.abi.isEnable && !requestedAbis.isNullOrEmpty()) {
+            androidDsl.defaultConfig.ndk.abiFilters.clear()
+            androidDsl.defaultConfig.ndk.abiFilters.addAll(requestedAbis)
+        }
     }
 }
 

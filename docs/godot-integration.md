@@ -9,6 +9,33 @@ Gradle merges the staged directory contents into the root of the APK's
 `assets/` directory. Do not place another folder between `massage-app-/` and
 `project.godot`.
 
+The sync task changes `run/main_scene` in the staged Android copy to
+`res://embedded_runtime.tscn`, warming the body, arrows, and HUD behind the
+Flutter menu. The original Godot project still starts at its own menu.
+`GodotSessionController` waits for `godot_ready` before sending a pending start.
+Flutter displays the scene edge to
+edge in landscape, then restores portrait and system UI when returning home.
+The `back` button lives in Godot's `UiLayer` and emits `back_to_menu`
+through the bridge; Flutter pops the session route. Without the bridge, the
+button opens Godot's own `main.tscn`. The scene skips window/orientation changes
+when embedded. `camera_zoom_out` in `cube_scene.gd` controls the wider camera
+framing (default 1.6).
+
+`start_session` removes the previous instance and instantiates a fresh massage
+scene from the cached PackedScene. `stop_session` disables processing and hides
+the Godot UI while the Flutter menu covers the viewport. `request_exit` requests
+an immediate return to the menu, just like Godot's back button, including
+Android system back. The timer starts automatically after the camera entrance.
+App backgrounding pauses time and animation. Two authored arrow groups alternate
+every 30 seconds for ten intervals; completion stops at exactly 300 seconds.
+
+The reference HUD contains only back, top progress, `MM:SS` remaining time,
+and sound. It has no ready card, position label, exit confirmation, or completion
+button. Camera placement solves the projected arrow bounds so their center lies
+halfway between the progress bar's bottom edge and the viewport's bottom edge,
+including mirrored paths and perspective depth. The sound button controls
+Godot's Master audio bus and restores its previous mute state when leaving.
+
 Using source assets instead of a prebuilt PCK keeps iteration simple and makes
 the Godot portion reviewable on GitHub. A production project may switch to a
 PCK by packaging it in Android assets and returning
@@ -26,11 +53,8 @@ Flutter sends this JSON string over the method channel:
 
 ```json
 {
-  "action": "configure",
-  "payload": {
-    "technique": "Slow circular pressure",
-    "durationSeconds": 300
-  }
+  "action": "start_session",
+  "payload": {}
 }
 ```
 
@@ -54,9 +78,15 @@ domain models makes it straightforward to evolve the massage experience.
   needs an AndroidX fragment host.
 - Flutter uses `PlatformViewLink` + `AndroidViewSurface`, selecting hybrid
   composition for Godot's native surface and touch input.
-- The Godot fragment is created when the first session widget attaches. When
-  Flutter disposes the platform view, the fragment is detached (its view is
-  destroyed, but its engine instance is retained) and later reattached.
+- A single Godot platform view is mounted in the MaterialApp builder at startup
+  and stays mounted behind the Navigator. The menu covers it; session routes
+  hide the Flutter layer and allow Godot to receive touches. Navigation never
+  replaces the engine. The runtime replaces only the massage scene.
+- Android also hides the native fragment view while in the menu. SurfaceView
+  rendering can otherwise appear above Flutter's menu regardless of Stack
+  order. The surface becomes visible before `start_session` is delivered.
+- Directly running `embedded_runtime.tscn` without a Flutter bridge starts an
+  active scene with its HUD; only embedded menu preloading hides and disables it.
 - Only one view is supported at a time, matching Godot's single engine instance
   per process limitation. The fragment is finally destroyed with the activity.
 - The manifest declares all relevant configuration changes so Android does not

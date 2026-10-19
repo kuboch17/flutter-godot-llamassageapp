@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../session/session_screen.dart';
+import '../../godot/godot_session_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -83,12 +84,15 @@ class _SessionCard extends StatelessWidget {
             const SizedBox(height: 24),
             FilledButton.icon(
               key: const Key('open-session'),
-              onPressed: () {
-                Navigator.of(context).push<void>(
+              onPressed: () async {
+                final session = GodotSessionController.instance;
+                session.open();
+                await Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
                     builder: (_) => const SessionScreen(),
                   ),
                 );
+                session.close();
               },
               icon: const Icon(Icons.play_arrow_rounded),
               label: const Text('Start interactive session'),
