@@ -1,8 +1,10 @@
-<h1 align="center">🦙 Llamassage</h1>
+<h1 align="center">Llamassage App</h1>
+<p align="center"><strong>Android / iOS</strong> · Native 3D integration currently available on Android</p>
 <h2 align="center">A little less tension.<br>A whole new dimension.</h2>
 
 <p align="center">
-  <strong>3D-guided massage. Built with Flutter &amp; Godot.</strong><br>
+  <strong>Open-source 3D-guided massage.</strong><br>
+  Built with Flutter &amp; Godot. Free to explore, modify, and build on.<br>
   Pick your areas. Set your time. Follow the movement.
 </p>
 
@@ -19,7 +21,9 @@
   <a href="#code-map"><strong>Read the code</strong></a>
 </p>
 
-![Real-time 3D massage with animated hands, movement guides, and live session controls](docs/images/massage-session.png)
+<p align="center">
+  <img src="docs/images/massage-session.png" width="620" alt="Godot 3D massage viewport with animated hands and live session controls" />
+</p>
 
 <h2 align="center">Your session. Three simple steps.</h2>
 
@@ -90,29 +94,10 @@ flowchart TB
 
 ### Session lifecycle
 
-```mermaid
-sequenceDiagram
-    participant F as Flutter
-    participant K as Kotlin bridge
-    participant G as Godot runtime
-    participant S as Session scene
-    F->>K: Mount platform view and subscribe
-    K-->>F: engine_ready
-    F->>K: ping
-    K->>G: flutter_message
-    G-->>K: godot_ready
-    K-->>F: godot_ready
-    Note over F,G: Engine and scene resources remain warm behind the menu
-    F->>K: start_session(configuration)
-    K->>G: flutter_message
-    G->>S: Instantiate fresh scene
-    S->>S: Camera entrance, timer and movement loop
-    S-->>K: back_to_menu
-    K-->>F: back_to_menu
-    F->>K: stop_session
-    K->>G: Disable session and hide HUD
-    Note over F,G: Flutter restores portrait; engine remains mounted
-```
+1. **Preload:** Flutter mounts the native view; Godot signals readiness.
+2. **Start:** the selected configuration creates a fresh session scene.
+3. **Play:** Godot runs the camera entrance, movement loop, and timer.
+4. **Return:** Flutter restores the portrait menu; the engine stays loaded.
 
 ### Bridge contract
 
