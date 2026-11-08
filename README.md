@@ -1,113 +1,258 @@
-# Massage Flow — Flutter × Godot
+# Llamassage
+### Flutter UI. Native Android bridge. Real-time 3D in Godot.
 
-An Android-first app in which Flutter owns the home screen and navigation while
-Godot renders the massage, timer, and session controls. Godot is not launched
-as a second application.
+An open-source massage app exploring how a polished Flutter interface and an embedded game engine can work together in one Android application. Choose body areas, configure a session, and move into a fullscreen 3D view with animated hands, directional guides, and live session controls.
 
-## What is implemented
+The Flutter package is named **Massage Flow** (`massage_flow`); **Llamassage** is the name shown in the launch experience.
 
-- Flutter Material 3 home and a fullscreen landscape massage view. A `back`
-  button inside Godot returns immediately to the portrait menu.
-- Five-minute sessions that start after the camera entrance, with a blue backdrop,
-  a minimal top progress bar, remaining time, and sound toggle matching the
-  supplied reference. Arrow groups change every 30 seconds and remain centered
-  between the progress bar and the bottom of the screen.
-- An embedded `GodotFragment` exposed through a Flutter platform view using
-  hybrid composition (appropriate for Godot's native render surface).
-- A lifecycle-aware Kotlin host that enforces Godot's one-engine-per-process
-  constraint.
-- Bidirectional Flutter ↔ Kotlin ↔ Godot communication using JSON envelopes.
-- The Godot project in `massage-app-`. `embedded_runtime.tscn` preloads the body
-  and arrow scene behind the menu; each session creates a fresh `cube_scene.tscn`.
-  Running Godot standalone still starts at `main.tscn`.
-- Dart unit/widget tests and a CI workflow for analyze, test, and Android build.
+[![Android CI](https://github.com/kuboch17/flutter-godot-llamassageapp/actions/workflows/ci.yml/badge.svg)](https://github.com/kuboch17/flutter-godot-llamassageapp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Flutter + Godot](https://img.shields.io/badge/Flutter_%2B_Godot-native_3D-2E88FF)
+![Platform](https://img.shields.io/badge/Platform-Android-3DDC84)
+
+[Architecture](#architecture) · [Quick start](#quick-start) · [Code map](#code-map) · [Contributing](#contributing)
+
+## The experience
+
+<p align="center">
+  <img src="docs/images/body-selection.png" width="270" alt="Portrait home screen with selectable body regions" />
+  &nbsp;&nbsp;
+  <img src="docs/images/session-settings.png" width="270" alt="Massage configuration with duration slider and selected body parts" />
+</p>
+
+<p align="center"><em>Select areas → set a duration → start a 3D session.</em></p>
+
+![Landscape Godot session with animated hands, movement guides, progress, remaining time, and sound controls](docs/images/massage-session.png)
+
+### What works today
+
+- **Body-area selection:** select regions on the illustrated body, review the selection, and return to editing without losing it.
+- **Session configuration:** choose a duration from 5 to 60 minutes; expandable catalog cards expose their own controls.
+- **Embedded 3D:** animated hands follow spline-based movement paths over a body model, with directional guides and camera framing.
+- **Session HUD:** SVG-based back and sound buttons, a progress bar, and a live remaining-time label.
+- **Session lifecycle:** camera entrance, automatic start, position changes every 30 seconds, pause on backgrounding, and stop at completion.
+- **Portrait-to-landscape navigation:** Flutter owns orientation and navigation; the Godot back button returns to the portrait menu.
+
+> **Development status:** the Android integration is implemented. Body-area selections reach Godot as session metadata, but the current scene still cycles through two authored movement positions. Region-specific animation routing is not implemented yet. The embedded renderer is Android-only; the Flutter UI and standalone Godot project can be developed separately.
+
+## Why this is interesting to build
+
+This repository brings together application UI, native rendering, and game-engine lifecycle management:
+
+| Engineering problem | Implementation |
+| --- | --- |
+| Embed a real-time renderer inside a Flutter app | `PlatformViewLink` and `AndroidViewSurface` host a native `GodotFragment` using hybrid composition. |
+| Avoid restarting the engine on every navigation | One Godot view stays mounted behind the Flutter navigator. Each session instantiates a fresh scene inside the retained engine. |
+| Coordinate startup across two runtimes | An `engine_ready` / `godot_ready` handshake delays session startup until the scene can receive commands. |
+| Keep UI and 3D logic independent | Dart and GDScript exchange JSON envelopes through a small Kotlin bridge. |
+| Keep movement guides visible across aspect ratios | Godot projects active arrow bounds and adjusts camera framing below the HUD. |
+| Package source scenes with the Android app | A Gradle sync task stages the Godot project into APK assets and switches only the staged entry scene. |
 
 ## Architecture
 
+### Runtime boundaries
+
 ```mermaid
-flowchart LR
-    Flutter["Flutter UI"] -->|"PlatformViewLink"| Native["Android Fragment container"]
-    Native --> Godot["GodotFragment + Godot project"]
-    Flutter -->|"MethodChannel / JSON"| Plugin["Runtime Godot plugin"]
-    Plugin -->|"Godot signal"| Godot
-    Godot -->|"@UsedByGodot method"| Plugin
-    Plugin -->|"EventChannel / JSON"| Flutter
+flowchart TB
+    UI["Flutter · screens and configuration"]
+    Controller["Dart · session controller and bridge"]
+    View["Flutter · AndroidViewSurface"]
+    Host["Kotlin · activity and fragment host"]
+    Plugin["Kotlin · Godot bridge plugin"]
+    Runtime["Godot · embedded runtime"]
+    Scene["Godot · massage scene and HUD"]
+
+    UI --> Controller
+    UI --> View
+    View -->|"Native render surface"| Host
+    Host -->|"Retains one engine"| Runtime
+    Controller -->|"MethodChannel · JSON commands"| Plugin
+    Plugin -->|"flutter_message signal"| Runtime
+    Runtime -->|"Creates a fresh session"| Scene
+    Scene -->|"sendToFlutter"| Plugin
+    Plugin -->|"EventChannel · events"| Controller
 ```
 
-The Android Gradle build stages `massage-app-/` as an asset source, excluding
-standalone APK exports, credentials, repository data, and editor caches.
-Consequently, `project.godot` is packaged at the APK asset root exactly where
-the embedded engine expects it.
+**Flutter owns the app experience.** Home screens, selection state, configuration, navigation, and display orientation live in Dart. The Godot platform view is mounted once at the app root; the Flutter layer covers it while the menu is visible.
 
-## Run on Android
+**Kotlin owns native integration.** The Android host manages the fragment and native surface visibility. `GodotBridgePlugin` forwards commands into a Godot signal and delivers engine events back to Dart, without interpreting massage behavior.
 
-Requirements: Flutter 3.47.x, Android SDK 36.1, Java 17, and an Android device or
-emulator with API 24+.
+**Godot owns the session.** `embedded_runtime.gd` handles incoming commands and scene creation. `cube_scene.gd` owns timing, position changes, animation, camera fitting, and exit behavior. The HUD lives in Godot's `UiLayer`, so its controls remain part of the rendered session.
 
-The checked-in Android configuration is pinned to Flutter 3.47.4, Godot 4.7.2,
-AGP 9.1.0, Gradle 9.3.1, and Kotlin 2.4.0.
+### Session lifecycle
+
+```mermaid
+sequenceDiagram
+    participant F as Flutter
+    participant K as Kotlin bridge
+    participant G as Godot runtime
+    participant S as Session scene
+    F->>K: Mount platform view and subscribe
+    K-->>F: engine_ready
+    F->>K: ping
+    K->>G: flutter_message
+    G-->>K: godot_ready
+    K-->>F: godot_ready
+    Note over F,G: Engine and scene resources remain warm behind the menu
+    F->>K: start_session(configuration)
+    K->>G: flutter_message
+    G->>S: Instantiate fresh scene
+    S->>S: Camera entrance, timer and movement loop
+    S-->>K: back_to_menu
+    K-->>F: back_to_menu
+    F->>K: stop_session
+    K->>G: Disable session and hide HUD
+    Note over F,G: Flutter restores portrait; engine remains mounted
+```
+
+### Bridge contract
+
+Flutter sends a JSON string through the `sendMessage` method on `dev.massageflow/godot_methods`:
+
+```json
+{
+  "action": "start_session",
+  "payload": {
+    "duration_seconds": 1500,
+    "body_parts": ["Back", "Left shoulder", "Right shoulder", "Neck"]
+  }
+}
+```
+
+| Direction | Message | Purpose |
+| --- | --- | --- |
+| Flutter → Godot | `ping` | Request runtime readiness, including after a Flutter hot restart. |
+| Flutter → Godot | `start_session` | Create a session using the supplied duration and body-area metadata. |
+| Flutter → Godot | `stop_session` | Disable processing and hide the session HUD. |
+| Flutter → Godot | `request_exit` | Ask the scene to follow its normal exit path. |
+| Native host → Flutter | `engine_ready` | Signal that the native engine is available. |
+| Godot → Flutter | `godot_ready` | Signal that the embedded runtime is ready for commands. |
+| Godot → Flutter | `back_to_menu` | Return to Flutter navigation. |
+
+Events arrive on `dev.massageflow/godot_events` as a platform map containing `type` and a JSON-encoded `payload` string. Dart decodes that map into a `GodotEvent`.
+
+See [the integration guide](docs/godot-integration.md) for native lifecycle details and troubleshooting.
+
+## Quick start
+
+### Toolchain
+
+These are the versions **declared by the repository**, not a claim of compatibility with every editor or SDK release.
+
+| Dependency | Repository configuration |
+| --- | --- |
+| Flutter | 3.47.4 in GitHub Actions |
+| Dart | `>=3.13.0 <4.0.0` in `pubspec.yaml` |
+| Java | 17 |
+| Android compile SDK | 36.1 |
+| Android device / emulator | API 24 or newer |
+| Godot Android library | `4.7.2.stable` in `android/gradle.properties` |
+| Android Gradle Plugin | 9.1.0 |
+| Kotlin plugin declaration | 2.4.0 |
+
+**Check Godot version alignment before changing assets.** The source project's feature declaration currently says Godot 4.6, while the Android dependency is pinned to 4.7.2. Align the editor, imported resources, and Android library for the build you intend to test.
+
+### Run the Android app
 
 ```sh
+git clone https://github.com/kuboch17/flutter-godot-llamassageapp.git
+cd flutter-godot-llamassageapp
+
+flutter doctor
 flutter pub get
-flutter analyze
-flutter test
-flutter run
+flutter devices
+flutter run -d <android-device-id>
 ```
 
-The first Android build downloads the pinned Godot Android AAR and is therefore
-larger and slower than a typical Flutter-only build.
+The first build downloads the Godot Android library and its native binaries. Expect a larger initial download and APK than a Flutter-only app.
 
-Device builds package only the requested processor architecture, including
-Godot's native libraries. `flutter run` selects the connected phone's
-architecture automatically; for a standalone Samsung arm64 APK use
-`flutter build apk --debug --target-platform android-arm64`.
+For an ARM64 debug APK:
 
-## Use the real Godot project
+```sh
+flutter build apk --debug --target-platform android-arm64
+```
 
-The embedded project lives in `massage-app-/` and starts its
-`embedded_runtime.tscn` scene. The build changes only the staged Android copy of
-`project.godot`; the standalone Godot menu is preserved. To update it:
+Flutter selects the attached device's architecture for `flutter run`; the Gradle configuration narrows Godot's packaged ABIs when a target platform is supplied.
 
-1. Copy the contents of the real project into `massage-app-/` so that
-   `massage-app-/project.godot` remains the project root.
-2. Match `godotVersion` in `android/gradle.properties` to the editor version.
-3. Flutter owns orientation, fullscreen display, and navigation. The Godot
-   scene's back button emits `back_to_menu` through `FlutterGodotBridge`.
-   The runtime handles `start_session`, `stop_session`, and `request_exit`.
-   Optional future messages can use the contract in `docs/godot-integration.md`.
-4. If the project uses GDExtension or Android plugins, include their Android
-   libraries for every supported ABI and add their Maven/AAR dependencies to
-   `android/app/build.gradle.kts`.
+### Work on the Godot scene
 
-Editor-only `.godot/` state and the Godot Android build template are ignored.
-For direct asset embedding, commit required `.godot/imported/` artifacts as well
-as source scenes, scripts, shaders, and source assets; alternatively package a
-PCK in CI.
+Open `massage-app-/project.godot` in the matching Godot editor, or use a `godot` executable available on your PATH:
 
-## Production notes
+```sh
+godot --editor --path massage-app-
+```
 
-- Replace the sample application ID and debug release signing before shipping.
-- Test navigation into and out of the Godot screen repeatedly on physical
-  devices; GPU and activity lifecycle behavior varies by vendor.
-- Keep one Godot platform view mounted at a time. The native host retains that
-  engine across session-screen navigation and rejects multi-instance mounting.
-- Godot flow tests: `godot --headless --path massage-app- --script res://tools/verify_session.gd`.
-- See `docs/godot-integration.md` for the message schema, troubleshooting, and
-  extension points.
+The standalone project starts at `main.tscn`. Android staging changes the entry point to `embedded_runtime.tscn`, leaving the source project's standalone menu intact.
 
-## Figma home flow
+To run the embedded scene without Flutter:
 
-The portrait home now uses the supplied Figma body image with selectable areas.
-Next slides up the custom massage panel; Edit slides it down without clearing
-selection or duration. The scrollable catalog has independently expandable cards
-with duration and area controls. Every Start massage action opens the embedded
-Godot scene and supplies `duration_seconds` and `body_parts`.
+```sh
+godot --path massage-app- res://embedded_runtime.tscn
+```
 
-Godot applies the configured duration (5–60 minutes) and retains the area list
-as session metadata. The current scene still has only its two existing movement
-positions; region-specific animation routing requires authored movements and a
-mapping of those positions to body areas. Selection does not yet change movements.
+Without the Flutter bridge, the runtime starts an active session directly.
 
-The session HUD uses the Figma blue and original back/sound icons. Run
-`flutter test` for selection/edit/catalog/navigation checks and the Godot session
-verification command above for timer, HUD, lifecycle, and configuration checks.
+### Asset import and packaging
+
+The Android `syncGodotAssets` task copies the project to generated APK assets, places `project.godot` at the asset root, and adjusts the staged viewport and orientation settings. It excludes editor state, exports, signing files, and development tools.
+
+**Gradle does not run Godot's import pipeline.** After changing models, textures, or SVGs, import them with the matching Godot editor and include required `.godot/imported/` resources. A PCK-based pipeline is a possible future alternative, not the current build path.
+
+## Code map
+
+| Location | Responsibility |
+| --- | --- |
+| [`lib/app.dart`](lib/app.dart) | App bootstrap, launch experience, and persistent Godot host. |
+| [`lib/features/home/`](lib/features/home/) | Body selection, configuration sheet, and massage catalog UI. |
+| [`lib/features/session/`](lib/features/session/) | Fullscreen route, orientation changes, and back navigation. |
+| [`lib/godot/`](lib/godot/) | Platform view, typed events, channel bridge, and session controller. |
+| [`android/app/src/main/kotlin/dev/massageflow/app/`](android/app/src/main/kotlin/dev/massageflow/app/) | Android activity, fragment host, and Godot plugin. |
+| [`android/app/build.gradle.kts`](android/app/build.gradle.kts) | Godot dependency, asset staging, and ABI packaging. |
+| [`massage-app-/embedded_runtime.gd`](massage-app-/embedded_runtime.gd) | Bridge command handling and fresh scene creation. |
+| [`massage-app-/cube_scene.gd`](massage-app-/cube_scene.gd) | Session state, timing, movement switching, and camera framing. |
+| [`massage-app-/massage_hands_controller.gd`](massage-app-/massage_hands_controller.gd) | Animated hand placement along movement paths. |
+| [`massage-app-/procedural_spline_mesh.gd`](massage-app-/procedural_spline_mesh.gd) | Procedural spline geometry. |
+| [`massage-app-/session_hud.gd`](massage-app-/session_hud.gd) | Progress, remaining time, back, and sound controls. |
+| [`massage-app-/assets/session/`](massage-app-/assets/session/) | Figma-exported SVG controls and progress textures. |
+| [`test/`](test/) | Dart bridge and Flutter widget tests. |
+
+## Validation
+
+```sh
+flutter analyze --fatal-infos
+flutter test
+godot --headless --path massage-app- --script res://tools/verify_session.gd
+```
+
+The Flutter tests cover bridge parsing and messaging, plus home-screen and navigation behavior. The Godot verification script exercises session startup, configuration, sound toggling, timing, background pause, completion, restart, exit, and camera framing at multiple landscape aspect ratios.
+
+[GitHub Actions](.github/workflows/ci.yml) runs Flutter analysis, tests, and an Android debug build on pushes to `main` and pull requests. Godot's session verification is currently a separate local check.
+
+For native integration changes, also test repeated entry and exit, Android back, background/resume, and orientation transitions on a physical device. Unit tests do not exercise the native render surface.
+
+## Next development opportunities
+
+- **Region-aware sessions:** map selected body areas to authored movement sequences.
+- **More movement content:** extend the two-position scene with additional paths and transitions.
+- **Toolchain alignment:** reconcile the Godot project/editor and Android library versions.
+- **Device coverage:** expand validation of engine reuse, orientation, and lifecycle behavior across Android GPUs.
+- **Release preparation:** replace debug release signing and validate the distributable package.
+- **Additional platforms:** implement native hosts beyond Android.
+
+These are contribution opportunities, not features already available in the app.
+
+## Contributing
+
+Bug reports, focused pull requests, and improvements to the 3D content are welcome.
+
+1. Open an issue for substantial changes so the proposed behavior and scope are clear.
+2. Keep changes in the layer that owns the behavior: Flutter for app UI, Kotlin for native integration, Godot for session rendering and logic.
+3. Run the relevant validation commands above. Include screenshots or a short recording for visible changes.
+4. For Android rendering bugs, include the device, Android version, reproduction steps, and relevant Flutter/Godot logs.
+5. For asset contributions, include source files and any required attribution or license information.
+
+Start with [open issues](https://github.com/kuboch17/flutter-godot-llamassageapp/issues), or read [the integration guide](docs/godot-integration.md) before changing the native bridge.
+
+## License
+
+[MIT](LICENSE) · Copyright © 2026 Massage Flow contributors.
