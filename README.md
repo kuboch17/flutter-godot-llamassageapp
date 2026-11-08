@@ -1,52 +1,61 @@
-# Llamassage
-### Flutter UI. Native Android bridge. Real-time 3D in Godot.
-
-An open-source massage app exploring how a polished Flutter interface and an embedded game engine can work together in one Android application. Choose body areas, configure a session, and move into a fullscreen 3D view with animated hands, directional guides, and live session controls.
-
-The Flutter package is named **Massage Flow** (`massage_flow`); **Llamassage** is the name shown in the launch experience.
-
-[![Android CI](https://github.com/kuboch17/flutter-godot-llamassageapp/actions/workflows/ci.yml/badge.svg)](https://github.com/kuboch17/flutter-godot-llamassageapp/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Flutter + Godot](https://img.shields.io/badge/Flutter_%2B_Godot-native_3D-2E88FF)
-![Platform](https://img.shields.io/badge/Platform-Android-3DDC84)
-
-[Architecture](#architecture) · [Quick start](#quick-start) · [Code map](#code-map) · [Contributing](#contributing)
-
-## The experience
+<h1 align="center">🦙 Llamassage</h1>
+<h2 align="center">A little less tension.<br>A whole new dimension.</h2>
 
 <p align="center">
-  <img src="docs/images/body-selection.png" width="270" alt="Portrait home screen with selectable body regions" />
-  &nbsp;&nbsp;
-  <img src="docs/images/session-settings.png" width="270" alt="Massage configuration with duration slider and selected body parts" />
+  <strong>3D-guided massage. Built with Flutter &amp; Godot.</strong><br>
+  Pick your areas. Set your time. Follow the movement.
 </p>
 
-<p align="center"><em>Select areas → set a duration → start a 3D session.</em></p>
+<p align="center">
+  <a href="https://github.com/kuboch17/flutter-godot-llamassageapp/actions/workflows/ci.yml"><img src="https://github.com/kuboch17/flutter-godot-llamassageapp/actions/workflows/ci.yml/badge.svg" alt="Android CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/Flutter_%2B_Godot-native_3D-2E88FF" alt="Flutter and Godot">
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84" alt="Android">
+</p>
 
-![Landscape Godot session with animated hands, movement guides, progress, remaining time, and sound controls](docs/images/massage-session.png)
+<p align="center">
+  <a href="#quick-start"><strong>Run it locally</strong></a> &nbsp;·&nbsp;
+  <a href="#architecture"><strong>Explore the architecture</strong></a> &nbsp;·&nbsp;
+  <a href="#code-map"><strong>Read the code</strong></a>
+</p>
 
-### What works today
+![Real-time 3D massage with animated hands, movement guides, and live session controls](docs/images/massage-session.png)
 
-- **Body-area selection:** select regions on the illustrated body, review the selection, and return to editing without losing it.
-- **Session configuration:** choose a duration from 5 to 60 minutes; expandable catalog cards expose their own controls.
-- **Embedded 3D:** animated hands follow spline-based movement paths over a body model, with directional guides and camera framing.
-- **Session HUD:** SVG-based back and sound buttons, a progress bar, and a live remaining-time label.
-- **Session lifecycle:** camera entrance, automatic start, position changes every 30 seconds, pause on backgrounding, and stop at completion.
-- **Portrait-to-landscape navigation:** Flutter owns orientation and navigation; the Godot back button returns to the portrait menu.
+<h2 align="center">Your session. Three simple steps.</h2>
 
-> **Development status:** the Android integration is implemented. Body-area selections reach Godot as session metadata, but the current scene still cycles through two authored movement positions. Region-specific animation routing is not implemented yet. The embedded renderer is Android-only; the Flutter UI and standalone Godot project can be developed separately.
+<p align="center"><strong>① Choose your areas &nbsp; → &nbsp; ② Set 5–60 minutes &nbsp; → &nbsp; ③ Follow in 3D</strong></p>
 
-## Why this is interesting to build
+<p align="center">
+  <img src="docs/images/body-selection.png" width="250" alt="Choose body areas on the interactive body map" />
+  &nbsp;&nbsp;
+  <img src="docs/images/session-settings.png" width="250" alt="Configure session duration and review selected areas" />
+</p>
 
-This repository brings together application UI, native rendering, and game-engine lifecycle management:
+<p align="center">
+  <strong>Animated hands.</strong> Clear movement guides. Live progress.<br>
+  Portrait setup. Fullscreen landscape sessions. One app.
+</p>
 
-| Engineering problem | Implementation |
-| --- | --- |
-| Embed a real-time renderer inside a Flutter app | `PlatformViewLink` and `AndroidViewSurface` host a native `GodotFragment` using hybrid composition. |
-| Avoid restarting the engine on every navigation | One Godot view stays mounted behind the Flutter navigator. Each session instantiates a fresh scene inside the retained engine. |
-| Coordinate startup across two runtimes | An `engine_ready` / `godot_ready` handshake delays session startup until the scene can receive commands. |
-| Keep UI and 3D logic independent | Dart and GDScript exchange JSON envelopes through a small Kotlin bridge. |
-| Keep movement guides visible across aspect ratios | Godot projects active arrow bounds and adjusts camera framing below the HUD. |
-| Package source scenes with the Android app | A Gradle sync task stages the Godot project into APK assets and switches only the staged entry scene. |
+---
+
+## Two engines. One experience.
+
+**Flutter handles the interface. Godot brings the movement to life.**  
+A Kotlin bridge connects them inside a single Android app.
+
+| Flutter | Kotlin | Godot |
+| --- | --- | --- |
+| Body selection & session setup | Native fragment & render surface | Real-time 3D & animated hands |
+| Navigation & orientation | Bidirectional JSON bridge | Spline guides & camera framing |
+| Persistent app shell | Engine lifecycle | Timer, progress & sound controls |
+
+### Built for more than a demo screen
+
+- **Warm engine, fresh sessions.** Keep Godot loaded; create a new scene for each massage.
+- **A real native surface.** Embed `GodotFragment` through Flutter's hybrid composition.
+- **A small, explicit protocol.** Send commands and receive events across Dart, Kotlin, and GDScript.
+- **Lifecycle-aware playback.** Pause in the background and return directly to the portrait menu.
+
 
 ## Architecture
 
@@ -230,16 +239,17 @@ The Flutter tests cover bridge parsing and messaging, plus home-screen and navig
 
 For native integration changes, also test repeated entry and exit, Android back, background/resume, and orientation transitions on a physical device. Unit tests do not exercise the native render surface.
 
-## Next development opportunities
+## Implementation scope
 
-- **Region-aware sessions:** map selected body areas to authored movement sequences.
-- **More movement content:** extend the two-position scene with additional paths and transitions.
-- **Toolchain alignment:** reconcile the Godot project/editor and Android library versions.
-- **Device coverage:** expand validation of engine reuse, orientation, and lifecycle behavior across Android GPUs.
-- **Release preparation:** replace debug release signing and validate the distributable package.
-- **Additional platforms:** implement native hosts beyond Android.
+<details>
+<summary><strong>Platform support and session content</strong></summary>
 
-These are contribution opportunities, not features already available in the app.
+- The embedded 3D renderer targets Android.
+- Sessions use two authored movement positions, alternating every 30 seconds.
+- Selected body areas are passed to Godot as metadata; they do not change the movement sequence.
+- The Flutter package is named `massage_flow` (Massage Flow); the app is presented as Llamassage.
+
+</details>
 
 ## Contributing
 
