@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="LaunchTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:windowSplashScreenBackground">#F7F5EF</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/empty_splash_icon</item>
+        <item name="android:windowSplashScreenBackground">#2E88FF</item>
         <item name="android:windowBackground">@drawable/launch_background</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">#F7F5EF</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#2E88FF</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
     </style>
 
     <style name="NormalTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">?android:colorBackground</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">#F7F5EF</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#2E88FF</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
     </style>
 </resources>
+
+
 

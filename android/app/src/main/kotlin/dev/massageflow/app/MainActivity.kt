@@ -141,6 +141,7 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
             }
         }
         godotMounted = true
+        updateGodotVisibility()
         updateSystemBars()
 
         if (godotReady) {
@@ -181,6 +182,8 @@ class MainActivity : FlutterFragmentActivity(), GodotHost {
     // A SurfaceView can render above Flutter's canvas even when the platform
     // view is behind the Navigator. Hide the native surface itself at the menu.
     private fun updateGodotVisibility() {
+        findViewById<View>(R.id.godot_fragment_container)?.alpha =
+            if (sessionActive) 1f else 0f
         godotFragment?.view?.visibility =
             if (sessionActive) View.VISIBLE else View.INVISIBLE
     }

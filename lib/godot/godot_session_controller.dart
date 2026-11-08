@@ -12,7 +12,9 @@ class GodotSessionController extends ChangeNotifier {
   StreamSubscription<GodotEvent>? _subscription;
   bool _ready = false;
   bool _active = false;
+  Map<String, Object?> _configuration = const {};
   bool get active => _active;
+  bool get ready => _ready;
 
   void preload() {
     _subscription ??= GodotBridge.instance.events.listen(
@@ -23,6 +25,7 @@ class GodotSessionController extends ChangeNotifier {
           unawaited(_send('ping'));
         } else if (event.type == 'godot_ready' && !_ready) {
           _ready = true;
+          notifyListeners();
           if (_active) unawaited(_send('start_session'));
         }
       },
@@ -34,13 +37,20 @@ class GodotSessionController extends ChangeNotifier {
 
   Future<void> _send(String action) async {
     try {
-      await GodotBridge.instance.send(action);
+      await GodotBridge.instance.send(
+        action,
+        action == 'start_session' ? _configuration : const {},
+      );
     } catch (_) {
       _ready = false;
     }
   }
 
-  void open() {
+  void open({int durationMinutes = 5, List<String> bodyParts = const []}) {
+    _configuration = {
+      'duration_seconds': durationMinutes * 60,
+      'body_parts': List<String>.of(bodyParts),
+    };
     _active = true;
     notifyListeners();
     if (_ready) unawaited(_send('start_session'));

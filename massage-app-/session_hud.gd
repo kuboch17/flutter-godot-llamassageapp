@@ -3,7 +3,7 @@ extends Control
 signal back_requested
 
 const ICON_BUTTON := preload("res://session_icon_button.gd")
-const REFERENCE_HEIGHT := 501.0
+const REFERENCE_SIZE := Vector2(957.0, 445.0)
 var back_button: Button
 var sound_button: Button
 var progress: ProgressBar
@@ -33,11 +33,16 @@ func _ready() -> void:
 
 	progress = ProgressBar.new()
 	progress.name = "Timebar"
-	progress.show_percentage = false
 	progress.max_value = 300
 	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	progress.add_theme_stylebox_override("background", _style(Color(1, 1, 1, 0.16), 999))
-	progress.add_theme_stylebox_override("fill", _style(Color.WHITE, 999))
+	progress.show_percentage = false
+	for entry in [["background", preload("res://assets/session/progress-track.svg")], ["fill", preload("res://assets/session/progress-fill.svg")]]:
+		var sprite_style := StyleBoxTexture.new()
+		sprite_style.texture = entry[1]
+		sprite_style.texture_margin_left = 4.0
+		sprite_style.texture_margin_right = 4.0
+		sprite_style.set_content_margin_all(0)
+		progress.add_theme_stylebox_override(entry[0], sprite_style)
 	add_child(progress)
 	time_label = Label.new()
 	time_label.name = "TimeRemaining"
@@ -50,14 +55,6 @@ func _ready() -> void:
 	resized.connect(_layout)
 	_layout()
 
-func _style(color: Color, radius: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = color
-	style.set_corner_radius_all(radius)
-	style.set_content_margin_all(0)
-	style.anti_aliasing = true
-	return style
-
 func _icon_button(icon: String, tooltip: String) -> Button:
 	var button := Button.new()
 	button.set_script(ICON_BUTTON)
@@ -65,26 +62,25 @@ func _icon_button(icon: String, tooltip: String) -> Button:
 	button.tooltip_text = tooltip
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.add_theme_stylebox_override("normal", _style(Color(1, 1, 1, 0.085), 999))
-	button.add_theme_stylebox_override("hover", _style(Color(1, 1, 1, 0.14), 999))
-	button.add_theme_stylebox_override("pressed", _style(Color(1, 1, 1, 0.21), 999))
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	return button
 
 func _layout() -> void:
 	if not is_instance_valid(back_button):
 		return
-	var factor := size.y / REFERENCE_HEIGHT
-	var diameter := 55.0 * factor
-	back_button.position = Vector2(48, 29) * factor
+	var factor := minf(size.x / REFERENCE_SIZE.x, size.y / REFERENCE_SIZE.y)
+	var diameter := 56.0 * factor
+	back_button.position = Vector2(30, 22) * factor
 	back_button.size = Vector2.ONE * diameter
-	sound_button.position = Vector2(size.x - 54.0 * factor - diameter, 29.0 * factor)
+	sound_button.position = Vector2(size.x - 26.0 * factor - diameter, 22.0 * factor)
 	sound_button.size = Vector2.ONE * diameter
-	var width := minf(275.0 * factor, size.x * 0.27)
-	progress.position = Vector2((size.x - width) * 0.5, 54.0 * factor)
-	progress.size = Vector2(width, 7.0 * factor)
-	time_label.add_theme_font_size_override("font_size", maxi(roundi(20.0 * factor), 12))
-	time_label.position = Vector2(sound_button.position.x - 84.0 * factor, 29.0 * factor)
-	time_label.size = Vector2(60.0, 55.0) * factor
+	var width := 270.0 * factor
+	progress.position = Vector2((size.x - width) * 0.5, 48.0 * factor)
+	progress.size = Vector2(width, 8.0 * factor)
+	time_label.add_theme_font_size_override("font_size", maxi(roundi(19.0 * factor), 12))
+	time_label.position = Vector2(sound_button.position.x - 74.0 * factor, 22.0 * factor)
+	time_label.size = Vector2(60.0, 56.0) * factor
 	back_button.queue_redraw()
 	sound_button.queue_redraw()
 
@@ -108,4 +104,3 @@ func _update_sound_tooltip() -> void:
 
 func _exit_tree() -> void:
 	AudioServer.set_bus_mute(0, _initial_muted)
-

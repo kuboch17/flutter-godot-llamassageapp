@@ -94,3 +94,20 @@ PCK in CI.
 - Godot flow tests: `godot --headless --path massage-app- --script res://tools/verify_session.gd`.
 - See `docs/godot-integration.md` for the message schema, troubleshooting, and
   extension points.
+
+## Figma home flow
+
+The portrait home now uses the supplied Figma body image with selectable areas.
+Next slides up the custom massage panel; Edit slides it down without clearing
+selection or duration. The scrollable catalog has independently expandable cards
+with duration and area controls. Every Start massage action opens the embedded
+Godot scene and supplies `duration_seconds` and `body_parts`.
+
+Godot applies the configured duration (5–60 minutes) and retains the area list
+as session metadata. The current scene still has only its two existing movement
+positions; region-specific animation routing requires authored movements and a
+mapping of those positions to body areas. Selection does not yet change movements.
+
+The session HUD uses the Figma blue and original back/sound icons. Run
+`flutter test` for selection/edit/catalog/navigation checks and the Godot session
+verification command above for timer, HUD, lifecycle, and configuration checks.

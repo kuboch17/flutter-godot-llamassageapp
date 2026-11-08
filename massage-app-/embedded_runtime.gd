@@ -14,11 +14,13 @@ func _ready() -> void:
 	if _bridge != null:
 		_bridge.sendToFlutter("godot_ready", "{}")
 
-func _spawn_session(active: bool) -> void:
+func _spawn_session(active: bool, configuration: Dictionary = {}) -> void:
 	if is_instance_valid(session):
 		remove_child(session)
 		session.queue_free()
 	session = MASSAGE_SCENE.instantiate()
+	session.duration_seconds = clampf(float(configuration.get("duration_seconds", 300)), 300.0, 3600.0)
+	session.set_meta("body_parts", configuration.get("body_parts", []))
 	add_child(session)
 	session.get_node("UiLayer").visible = active
 	if not active:
@@ -34,7 +36,7 @@ func _on_flutter_message(message_json: String) -> void:
 			if _bridge != null:
 				_bridge.sendToFlutter("godot_ready", "{}")
 		"start_session":
-			_spawn_session(true)
+			_spawn_session(true, message.get("payload", {}))
 		"stop_session":
 			if is_instance_valid(session):
 				session.process_mode = Node.PROCESS_MODE_DISABLED

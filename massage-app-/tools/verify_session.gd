@@ -42,7 +42,7 @@ func _verify() -> void:
 	assert(session.positions.size() == 2)
 	assert(session.hud.get_children().size() == 4)
 	assert(session.hud.time_label.text == "05:00")
-	assert(session.get_node("WorldEnvironment").environment.background_color == Color("064bef"))
+	assert(session.get_node("WorldEnvironment").environment.background_color == Color("2e88ff"))
 	assert(session.hud.progress.position.y < session.get_viewport().get_visible_rect().size.y * 0.13)
 
 	for resolution in [Vector2i(1920, 1080), Vector2i(2340, 1080), Vector2i(1280, 720)]:
@@ -85,6 +85,13 @@ func _verify() -> void:
 	assert(session.elapsed_seconds == 0.0)
 	assert(session.phase == session.Phase.INTRO)
 	assert(session.active_position == 0)
+	runtime._on_flutter_message('{"action":"start_session","payload":{"duration_seconds":1500,"body_parts":["Neck","Shoulders"]}}')
+	await process_frame
+	await process_frame
+	session = runtime.session
+	assert(session.duration_seconds == 1500.0)
+	assert(session.get_meta("body_parts") == ["Neck", "Shoulders"])
+	assert(session.hud.time_label.text == "25:00")
 	# The only navigation button returns directly, without another dialog.
 	session.hud.back_button.pressed.emit()
 	await process_frame

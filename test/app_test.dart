@@ -34,7 +34,20 @@ void main() {
     );
     try {
       await tester.pumpWidget(const MassageFlowApp());
-      expect(find.text('Massage Flow'), findsOneWidget);
+      await tester.runAsync(() async {
+        final context = tester.element(find.byType(Scaffold).first);
+        await precacheImage(const AssetImage('assets/figma/body_selector.png'), context);
+        await precacheImage(const AssetImage('assets/figma/llama_header.png'), context);
+      });
+      expect(find.text('llamassage'), findsOneWidget);
+      expect(find.text('Welcome back!'), findsNothing);
+      await tester.pump(const Duration(milliseconds: 1400));
+      await tester.pumpAndSettle();
+      expect(find.text('Welcome back!'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('sector-neck')));
+      await tester.pump();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
       // The native viewport is already mounted while the menu is visible.
       expect(find.byType(GodotView), findsOneWidget);
       tester.binding.channelBuffers.push(
@@ -47,6 +60,8 @@ void main() {
       );
       await tester.pump();
 
+      await tester.ensureVisible(find.byKey(const Key('open-session')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('open-session')));
       await tester.pumpAndSettle();
       expect(sentActions.last, contains('start_session'));
@@ -129,6 +144,8 @@ void main() {
             .arguments,
         'SystemUiMode.edgeToEdge',
       );
+      await tester.ensureVisible(find.byKey(const Key('open-session')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('open-session')));
       await tester.pumpAndSettle();
       expect(

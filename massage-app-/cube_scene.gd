@@ -36,7 +36,7 @@ func _ready() -> void:
 		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
 	get_tree().auto_accept_quit = false
 	var environment := $WorldEnvironment.environment.duplicate() as Environment
-	environment.background_color = Color("064bef")
+	environment.background_color = Color("2e88ff")
 	$WorldEnvironment.environment = environment
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	for child in get_children():

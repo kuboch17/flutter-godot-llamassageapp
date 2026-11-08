@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
+
+import 'dart:async';
+
+import 'app_theme.dart';
 
 import 'features/home/home_screen.dart';
 import 'godot/godot_session_controller.dart';
@@ -9,32 +15,107 @@ class MassageFlowApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const seedColor = Color(0xFF49645D);
-
     return MaterialApp(
       title: 'Massage Flow',
       debugShowCheckedModeBanner: false,
-      builder: (context, child) => _PreloadedGodotHost(child: child!),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: seedColor,
-          brightness: Brightness.light,
-          surface: const Color(0xFFF7F5EF),
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarDividerColor: Colors.transparent,
+          systemNavigationBarIconBrightness: Brightness.light,
+          systemNavigationBarContrastEnforced: false,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F5EF),
-        useMaterial3: true,
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(54),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        ),
+        child: _PreloadedGodotHost(child: child!),
       ),
-      home: const HomeScreen(),
+      theme: buildMassageTheme(),
+      home: const _LaunchScreen(),
     );
   }
+}
+
+class _LaunchScreen extends StatefulWidget {
+  const _LaunchScreen();
+
+  @override
+  State<_LaunchScreen> createState() => _LaunchScreenState();
+}
+
+class _LaunchScreenState extends State<_LaunchScreen> {
+  Timer? _timer;
+  bool _minimumElapsed = false;
+  bool _leaving = false;
+  bool _assetsReady = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_assetsReady) return;
+    Future.wait([
+      precacheImage(
+        const AssetImage('assets/figma/body_selector.png'),
+        context,
+      ),
+      precacheImage(const AssetImage('assets/figma/llama_header.png'), context),
+    ]).then((_) {
+      if (!mounted) return;
+      _assetsReady = true;
+      _showHomeWhenReady();
+    });
+  }
+
+  void _showHomeWhenReady() {
+    final needsGodot =
+        !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+    if (!mounted ||
+        _leaving ||
+        !_minimumElapsed ||
+        !_assetsReady ||
+        (needsGodot && !GodotSessionController.instance.ready)) {
+      return;
+    }
+    _leaving = true;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    GodotSessionController.instance.addListener(_showHomeWhenReady);
+    _timer = Timer(const Duration(milliseconds: 1400), () {
+      _minimumElapsed = true;
+      _showHomeWhenReady();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    GodotSessionController.instance.removeListener(_showHomeWhenReady);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => _leaving
+      ? const HomeScreen()
+      : const Scaffold(
+          backgroundColor: Color(0xFF2E88FF),
+          body: SafeArea(
+            child: Center(
+              child: Text(
+                'llamassage',
+                semanticsLabel: 'Llamassage',
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -1.5,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        );
 }
 
 class _PreloadedGodotHost extends StatefulWidget {

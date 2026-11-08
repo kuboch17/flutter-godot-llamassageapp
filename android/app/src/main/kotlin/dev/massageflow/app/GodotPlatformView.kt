@@ -24,6 +24,7 @@ private class GodotPlatformView(
 ) : PlatformView, View.OnAttachStateChangeListener {
     private val container = FragmentContainerView(activity).apply {
         id = R.id.godot_fragment_container
+        alpha = 0f
         setBackgroundColor(Color.rgb(23, 32, 30))
         layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
